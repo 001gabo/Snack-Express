@@ -1,0 +1,13 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.galfo.prueba_combos.MainActivity">
+    <item android:title="Generar factura"
+        android:id="@+id/cm_factura" />
+    <item android:title="Editar"
+        android:id="@+id/cm_editar" />
+    <item
+        android:id="@+id/cm_borrar"
+        android:title="Borrar" />
+
+</menu>
