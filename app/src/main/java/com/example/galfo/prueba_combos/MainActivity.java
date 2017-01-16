@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.SystemClock;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
@@ -97,6 +98,7 @@ public class MainActivity extends AppCompatActivity implements Serializable {
         AgregarcomboM();
         verTodo();
         creador_botones();
+        FacturaAutomatica();
 
     }
 
@@ -133,30 +135,31 @@ public class MainActivity extends AppCompatActivity implements Serializable {
             finish();
             return true;
         }
-        if (id == R.id.cm_factura) {
+        return super.onOptionsItemSelected(item);
+    }
 
-            //PARA CREAR UNA CARPETA
-            File f = new File(Environment.getExternalStorageDirectory() + "/Snack Express");
-            // Comprobamos si la carpeta está ya creada
-            // Si la carpeta no está creada, la creamos.
-            String newFolder = "/Snack Express"; //cualquierCarpeta es el nombre de la Carpeta que vamos a crear
-            String extStorageDirectory = Environment.getExternalStorageDirectory().toString();
-            String outPath = Environment.getExternalStorageDirectory().toString()+"/Snack Express";
-            File myNewFolder = new File(extStorageDirectory + newFolder);
+    public void CrearCarpeta(){
 
-            if(!f.isDirectory()) {
-                myNewFolder.mkdir(); //creamos la carpeta
-                Toast.makeText(MainActivity.this,"Se ha creado la carpeta 'Snack Express' y dentro de ella se encuentra la factura",Toast.LENGTH_LONG).show();
-                crearPDF(NombreDoc,outPath);
 
-            }else{
-                Toast.makeText(MainActivity.this,"Se ha creado el documento dentro de la carpeta 'Snack Express'",Toast.LENGTH_LONG).show();
-                crearPDF(NombreDoc,outPath);
-            }
-            return true;
+        //PARA CREAR UNA CARPETA
+        File f = new File(Environment.getExternalStorageDirectory() + "/Snack Express");
+        // Comprobamos si la carpeta está ya creada
+        // Si la carpeta no está creada, la creamos.
+        String newFolder = "/Snack Express"; //cualquierCarpeta es el nombre de la Carpeta que vamos a crear
+        String extStorageDirectory = Environment.getExternalStorageDirectory().toString();
+        String outPath = Environment.getExternalStorageDirectory().toString()+"/Snack Express";
+        File myNewFolder = new File(extStorageDirectory + newFolder);
+
+        if(!f.isDirectory()) {
+            myNewFolder.mkdir(); //creamos la carpeta
+            Toast.makeText(MainActivity.this,"Se ha creado la carpeta 'Snack Express' y dentro de ella se encuentra la factura",Toast.LENGTH_LONG).show();
+            crearPDF(NombreDoc,outPath);
+
+        }else{
+            Toast.makeText(MainActivity.this,"Se ha creado el documento dentro de la carpeta 'Snack Express'",Toast.LENGTH_LONG).show();
+            crearPDF(NombreDoc,outPath);
         }
 
-        return super.onOptionsItemSelected(item);
     }
 
     public void crearPDF(String NombreDoc,String outPath){
@@ -273,7 +276,6 @@ public class MainActivity extends AppCompatActivity implements Serializable {
                 public void onClick(View v) {
                     idcomboCC=btn.getText().toString();
                     Log.i("TAG","The index is" + index);
-                    FacturaAutomatica();
                    Intent intent = new Intent(ctx, ContenidoCombo.class);
                    startActivity(intent);
                     finish();
@@ -284,22 +286,25 @@ public class MainActivity extends AppCompatActivity implements Serializable {
         }
     }
 
-    public void FacturaAutomatica(){
+    public void FacturaAutomatica() {
         Date when = new Date(System.currentTimeMillis());
-        long intervalo =1*1000;
+        long intervalo = 10000;
 
-        try{
-            Intent someIntent = new Intent(ctx,BroadcastReceiver.class); // intent to be launched
+        try {
+            Intent someIntent = new Intent(ctx, BroadcastReciever.class); // intent to be launched
 
             // note this could be getActivity if you want to launch an activity
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(ctx, 0, someIntent,0); // PendintIntent flag
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(ctx, 0, someIntent, 0); // PendintIntent flag
 
-            AlarmManager alarms = (AlarmManager)ctx.getSystemService(Context.ALARM_SERVICE);
+            AlarmManager alarms = (AlarmManager) ctx.getSystemService(Context.ALARM_SERVICE);
 
-            alarms.setInexactRepeating(AlarmManager.RTC_WAKEUP,System.currentTimeMillis(),intervalo,pendingIntent);
-            Toast.makeText(this, "Alarm Set", Toast.LENGTH_SHORT).show();
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(System.currentTimeMillis());
 
-        }catch(Exception e){
+            alarms.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis() + intervalo, intervalo, pendingIntent);
+            CrearCarpeta();
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
